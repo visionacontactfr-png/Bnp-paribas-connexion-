@@ -1,40 +1,251 @@
-<!doctype html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BNP Paribas - Interface</title>
+<html>
+ <head>  
+ </head> 
+ <body> 
+  <meta charset="utf-8"> 
+  <meta name="viewport" content="width=device-width,initial-scale=1"> 
+  <title>Tableau de bord - BNP PARIBAS</title> 
   <style>
-    body {
-      font-family: 'Roboto', sans-serif;
-      background: #f9f9f9;
-      text-align: center;
-      margin: 0;
-      padding: 40px;
+    :root{--green:#1a8a52;--muted:#6b7280;--card:#fff;--bg:#f3f6fa}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Roboto,Arial,sans-serif;background:var(--bg);color:#1f2937}
+    .top{display:flex;align-items:center;gap:12px;padding:14px 16px;background:white;box-shadow:0 2px 8px rgba(10,20,30,0.04)}
+    .menu-btn{width:38px;height:38px;border-radius:8px;background:transparent;border:1px solid #e6eef3;display:flex;align-items:center;justify-content:center;cursor:pointer}
+    .brand{font-weight:700;font-size:16px;flex:1;text-align:center}
+    .wrap{max-width:920px;margin:18px auto;padding:0 16px}
+    .balance-card{background:linear-gradient(90deg,var(--green),#0f7a45);color:white;padding:18px;border-radius:12px;box-shadow:0 6px 20px rgba(10,20,30,0.06);display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .balance-left{display:flex;flex-direction:column}
+    .balance-left .label{font-size:15px;opacity:0.95}
+    .balance-left .amount{font-size:28px;font-weight:700;margin-top:6px}
+    .balance-right{font-size:14px;text-align:right;opacity:0.95}
+    .status{text-align:center;margin:14px 0 8px;color:#d23a3a;font-weight:700}
+    .tiles{display:flex;gap:12px;margin:12px 0;flex-wrap:wrap}
+    .tile{flex:1;min-width:120px;background:white;padding:16px;border-radius:10px;box-shadow:0 6px 18px rgba(10,20,30,0.04);text-align:center;cursor:pointer}
+    .tile .icon{font-size:22px;margin-bottom:8px;opacity:0.9}
+    .tile .title{font-weight:600}
+    .cards-row{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap}
+    .small-card{flex:1;min-width:180px;background:white;padding:14px;border-radius:10px;box-shadow:0 6px 18px rgba(10,20,30,0.04)}
+    .small-card .meta{font-size:13px;color:var(--muted)}
+    .small-card .value{font-weight:700;font-size:18px;margin-top:8px}
+    .ops{margin-top:18px;background:white;padding:14px;border-radius:12px;box-shadow:0 6px 18px rgba(10,20,30,0.04)}
+    .ops h3{margin:0 0 12px}
+    .op{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f0f3f8}
+    .op:last-child{border-bottom:none}
+    .bottom-nav{position:fixed;left:0;right:0;bottom:0;background:white;border-top:1px solid #e6eef3;display:flex;justify-content:space-around;padding:8px 0}
+    .nav-item{font-size:12px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;padding:4px 6px}
+    .nav-item.active{color:var(--green);font-weight:600}
+    .sidebar{position:fixed;left:0;top:0;bottom:0;width:320px;background:#ffffff;transform:translateX(-360px);transition:transform .28s ease;box-shadow:6px 0 30px rgba(10,20,30,0.08);padding:18px}
+    .sidebar.open{transform:translateX(0)}
+    .sidebar .profile{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+    .avatar{width:56px;height:56px;border-radius:50%;background:#eef6f0;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--green)}
+    .overlay{position:fixed;inset:0;background:rgba(10,15,20,0.35);display:none;align-items:center;justify-content:center}
+    .overlay.show{display:flex}
+    .modal{background:white;padding:18px;border-radius:10px;max-width:520px;width:94%}
+    @media(max-width:600px){.wrap{padding:0 12px}.balance-card{flex-direction:column;align-items:flex-start;gap:8px}}
+  </style> 
+  <div id="sidebar" class="sidebar" aria-hidden="true"> 
+   <div style="position:absolute;right:10px;top:10px;cursor:pointer" onclick="toggleSidebar()">
+     ✕ 
+   </div> 
+   <div class="profile"> 
+    <div class="avatar">
+      ZJ 
+    </div> 
+    <div> 
+     <div style="font-weight:700">
+       ZAMI JADEN 
+     </div> 
+     <div style="font-size:13px;color:#6b7280">
+       N° 1545xxxx 
+     </div> 
+    </div> 
+   </div> 
+   <div style="background:#f8fafc;padding:14px;border-radius:10px;margin-bottom:12px"> 
+    <div style="font-size:13px;color:#6b7280">
+      Mon solde 
+    </div> 
+    <div style="font-weight:700;font-size:20px;margin-top:6px;color:var(--green)">
+      187.070,00 € 
+    </div> 
+   </div> 
+   <nav style="display:flex;flex-direction:column;gap:8px;"> 
+    <button onclick="goto('home')" style="text-align:left;padding:12px;border-radius:8px;border:none;background:transparent;cursor:pointer">Accueil</button> 
+    <button onclick="showCards()" style="text-align:left;padding:12px;border-radius:8px;border:none;background:transparent;cursor:pointer">Cartes et comptes</button> 
+    <button onclick="logout()" style="text-align:left;padding:12px;border-radius:8px;border:none;background:transparent;cursor:pointer;color:#d23a3a">Déconnexion</button> 
+   </nav> 
+  </div> 
+  <div class="top"> 
+   <button class="menu-btn" onclick="toggleSidebar()">☰</button> 
+   <div class="brand">
+     Bienvenue JADEN — Espace client 
+   </div> 
+  </div> 
+  <div class="wrap"> 
+   <div class="balance-card"> 
+    <div class="balance-left"> 
+     <div class="label">
+       Mon solde 
+     </div> 
+     <div class="amount">
+       187.070,00 € 
+     </div> 
+    </div> 
+    <div class="balance-right"> 
+     <div style="font-size:13px;color:rgba(255,255,255,0.85)">
+       Votre gestionnaire 
+     </div> 
+     <div style="color:rgba(255,255,255,0.95);font-weight:600;margin-top:6px">
+       Antoine Sire 
+     </div> 
+    </div> 
+   </div> 
+   <div class="status">
+     STATUT DU COMPTE : BLOQUÉ DEPUIS LE 18 JUIN 2025 
+   </div> 
+   <div class="tiles"> 
+    <div class="tile" onclick="actionBlocked('Retrait')"> 
+     <div class="icon"></div> 
+     <div class="title">
+       Retraits 
+     </div> 
+    </div> 
+    <div class="tile" onclick="actionBlocked('Virement')"> 
+     <div class="icon"></div> 
+     <div class="title">
+       Virements 
+     </div> 
+    </div> 
+    <div class="tile" onclick="showCards()"> 
+     <div class="icon"></div> 
+     <div class="title">
+       Mes cartes 
+     </div> 
+    </div> 
+   </div> 
+   <div class="cards-row"> 
+    <div class="small-card"> 
+     <div class="meta">
+       Mes économies 
+     </div> 
+     <div class="value">
+       25.000,00 € 
+     </div> 
+    </div> 
+    <div class="small-card"> 
+     <div class="meta">
+       Compte d'épargne 
+     </div> 
+     <div class="value">
+       70.000,00 € 
+     </div> 
+    </div> 
+   </div> 
+   <div style="height:12px"></div> 
+   <div class="ops"> 
+    <h3>Dépenses récentes</h3> 
+    <div class="op"> 
+     <div> 
+      <strong>Pharmacie</strong> 
+      <div style="font-size:12px;color:var(--muted)">
+        22 déc 2023 
+      </div> 
+     </div> 
+     <div style="color:#d23a3a">
+       -80 € 
+     </div> 
+    </div> 
+    <div class="op"> 
+     <div> 
+      <strong>Internet</strong> 
+      <div style="font-size:12px;color:var(--muted)">
+        15 jan 2024 
+      </div> 
+     </div> 
+     <div style="color:#d23a3a">
+       -50 € 
+     </div> 
+    </div> 
+    <div class="op"> 
+     <div> 
+      <strong>Paiement maison</strong> 
+      <div style="font-size:12px;color:var(--muted)">
+        10 mars 2024 
+      </div> 
+     </div> 
+     <div style="color:#d23a3a">
+       -20.000 € 
+     </div> 
+    </div> 
+   </div> 
+  </div> 
+  <div class="bottom-nav"> 
+   <div class="nav-item active" onclick="goto('home')">
+     🏠 
+    <div>
+      Accueil 
+    </div> 
+   </div> 
+   <div class="nav-item" onclick="showCards()">
+     💳 
+    <div>
+      Cartes &amp; Comptes 
+    </div> 
+   </div> 
+  </div> 
+  <div id="overlay" class="overlay"> 
+   <div class="modal" id="modalContent"></div> 
+  </div> 
+  <script>
+    // Vérifie si l'utilisateur est connecté, sinon le renvoie à la page de connexion
+    if(sessionStorage.getItem("connected") !== "1"){ window.location.href = "login.html"; }
+
+    function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); }
+
+    function goto(page){ toggleSidebar(); if(page === 'home'){ window.scrollTo({top:0,behavior:'smooth'}); } }
+
+    function actionBlocked(actionName){
+      const modal = document.getElementById('modalContent');
+      modal.innerHTML = `<h3>${actionName} impossible</h3>
+        <p style="color:#d23a3a;font-weight:700;font-size:16px;">COMPTE ACTUELLEMENT BLOQUÉ</p>
+        <p>Votre compte a été bloqué le <strong>18 juin 2025</strong>. Pour procéder au déblocage, des frais de service d'un montant de <strong>30.000,00 €</strong> sont requis.</p>
+        <p>Veuillez contacter votre gestionnaire, <strong>M. Antoine Sire</strong>, pour finaliser la procédure.</p>
+        <div style="display:flex;justify-content:flex-end;margin-top:16px">
+          <button onclick="closeModal()" style="padding:8px 12px;border-radius:8px;border:1px solid #e6edf2;background:#fff;cursor:pointer">Fermer</button>
+        </div>`;
+      document.getElementById('overlay').classList.add('show');
     }
-    header {
-      background: #1a5336;
-      color: white;
-      padding: 15px;
-      font-size: 20px;
-      border-radius: 8px;
+
+    function showCards(){
+      const modal = document.getElementById('modalContent');
+      modal.innerHTML = `<h3>Mes cartes</h3>
+        <p>Liste des cartes associées au compte.</p>
+        <ul style="margin-top:8px;padding-left:18px">
+          <li><strong>Carte Principale</strong> • Visa •••• 3853 • Statut : Bloquée</li>
+          <li><strong>Carte Secondaire</strong> • Mastercard ••••• 6789 • Statut : Bloquée</li>
+          <li><strong>Carte Additionnelle</strong> • Electron ••••• 4321 • Statut : Bloquée</li>
+        </ul>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+          <button onclick="closeModal()" style="padding:8px 12px;border-radius:8px;border:1px solid #e6edf2;background:#fff;cursor:pointer">Fermer</button>
+        </div>`;
+      document.getElementById('overlay').classList.add('show');
     }
-    button {
-      background: #d9534f;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-top: 30px;
-      transition: 0.3s;
+
+    function closeModal(){ document.getElementById('overlay').classList.remove('show'); document.getElementById('modalContent').innerHTML = ''; }
+
+    function logout(){ 
+        sessionStorage.removeItem('connected'); 
+        window.location.href = "login.html"; 
     }
-    button:hover {
-      background: #c9302c;
-    }
-  </style>
-</head>
-<body>
+
+    let timer;
+    function resetTimer(){ clearTimeout(timer); timer = setTimeout(()=>{ logout(); }, 120000); }
+    document.addEventListener('mousemove', resetTimer);
+    document.addEventListener('click', resetTimer);
+    document.addEventListener('keydown', resetTimer);
+    resetTimer();
+  </script>   
+ </body>
+</html><body>
   <header>Bienvenue sur votre espace client BNP Paribas</header>
   <h2>Vous êtes connecté.</h2>
   <button id="logout">Déconnexion</button>
