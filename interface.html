@@ -160,14 +160,14 @@
     }
 
     function logout() {
-      window.location.href = "login.html";
+      window.location.href = "connexion.html";
     }
 
     let timer;
     function resetTimer() {
       clearTimeout(timer);
       timer = setTimeout(() => {
-        window.location.href = "login.html";
+        window.location.href = "connexion.html";
       }, 120000);
     }
     document.addEventListener("mousemove", resetTimer);
