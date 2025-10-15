@@ -1,40 +1,270 @@
-<html>
+<html> 
  <head>  
  </head> 
  <body> 
-  <meta charset="utf-8"> 
-  <meta name="viewport" content="width=device-width,initial-scale=1"> 
-  <title>Tableau de bord - BNP PARIBAS</title> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>Espace Client BNP Paribas</title> 
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet"> 
   <style>
-    :root{--green:#1a8a52;--muted:#6b7280;--card:#fff;--bg:#f3f6fa}
-    *{box-sizing:border-box}
-    body{margin:0;font-family:Roboto,Arial,sans-serif;background:var(--bg);color:#1f2937}
-    .top{display:flex;align-items:center;gap:12px;padding:14px 16px;background:white;box-shadow:0 2px 8px rgba(10,20,30,0.04)}
-    .menu-btn{width:38px;height:38px;border-radius:8px;background:transparent;border:1px solid #e6eef3;display:flex;align-items:center;justify-content:center;cursor:pointer}
-    .brand{font-weight:700;font-size:16px;flex:1;text-align:center}
-    .wrap{max-width:920px;margin:18px auto;padding:0 16px}
-    .balance-card{background:linear-gradient(90deg,var(--green),#0f7a45);color:white;padding:18px;border-radius:12px;box-shadow:0 6px 20px rgba(10,20,30,0.06);display:flex;justify-content:space-between;align-items:center;gap:12px}
-    .balance-left{display:flex;flex-direction:column}
-    .balance-left .label{font-size:15px;opacity:0.95}
-    .balance-left .amount{font-size:28px;font-weight:700;margin-top:6px}
-    .balance-right{font-size:14px;text-align:right;opacity:0.95}
-    .status{text-align:center;margin:14px 0 8px;color:#d23a3a;font-weight:700}
-    .tiles{display:flex;gap:12px;margin:12px 0;flex-wrap:wrap}
-    .tile{flex:1;min-width:120px;background:white;padding:16px;border-radius:10px;box-shadow:0 6px 18px rgba(10,20,30,0.04);text-align:center;cursor:pointer}
-    .tile .icon{font-size:22px;margin-bottom:8px;opacity:0.9}
-    .tile .title{font-weight:600}
-    .cards-row{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap}
-    .small-card{flex:1;min-width:180px;background:white;padding:14px;border-radius:10px;box-shadow:0 6px 18px rgba(10,20,30,0.04)}
-    .small-card .meta{font-size:13px;color:var(--muted)}
-    .small-card .value{font-weight:700;font-size:18px;margin-top:8px}
-    .ops{margin-top:18px;background:white;padding:14px;border-radius:12px;box-shadow:0 6px 18px rgba(10,20,30,0.04)}
-    .ops h3{margin:0 0 12px}
-    .op{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f0f3f8}
-    .op:last-child{border-bottom:none}
-    .bottom-nav{position:fixed;left:0;right:0;bottom:0;background:white;border-top:1px solid #e6eef3;display:flex;justify-content:space-around;padding:8px 0}
-    .nav-item{font-size:12px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;padding:4px 6px}
-    .nav-item.active{color:var(--green);font-weight:600}
-    .sidebar{position:fixed;left:0;top:0;bottom:0;width:320px;background:#ffffff;transform:translateX(-360px);transition:transform .28s ease;box-shadow:6px 0 30px rgba(10,20,30,0.08);padding:18px}
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            background: #f8f8f8;
+            color: #333;
+        }
+        .header {
+            background: #00794f;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            font-size: 14px;
+        }
+        .header img {
+            height: 30px;
+        }
+        .content {
+            padding: 15px;
+            max-width: 600px;
+            margin: auto;
+        }
+        h2 {
+            color: #00794f;
+            font-size: 22px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #00794f;
+            padding-bottom: 5px;
+        }
+        .info {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .solde {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 8px 0;
+        }
+        .bloque {
+            color: red;
+            font-weight: bold;
+            font-size: 16px;
+            margin: 5px 0;
+            animation: clignote 1s infinite;
+        }
+        @keyframes clignote {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        .date {
+            font-size: 13px;
+            color: gray;
+        }
+        .operations {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .operations h3 {
+            margin-top: 0;
+            color: #00794f;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 8px;
+        }
+        .operation {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .operation:last-child {
+            border-bottom: none;
+        }
+        .op-name { font-size: 14px; font-weight: 500; }
+        .op-date { font-size: 12px; color: gray; }
+        .op-montant { font-size: 15px; font-weight: bold; }
+        .credit { color: green; }
+        .debit { color: red; }
+        .nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            border-top: 1px solid #ddd;
+            padding: 8px 0;
+        }
+        .nav div {
+            text-align: center;
+            font-size: 14px;
+            color: #555;
+            cursor: pointer;
+            flex: 1;
+        }
+        .nav div.active { color: #00794f; font-weight: bold; }
+    </style> 
+  <div class="header"> 
+   <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjMwIiB2aWV3Qm94PSIwIDAgMTUwIDMwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iMzAiIGZpbGw9IiMwMDc5NGYiLz4KICA8dGV4dCB4PSI1IiB5PSIyMCIgZmlsbD0id2hpdGUiIGZvbnQtc2l6ZT0iMTZweCIgZm9udC1mYW1pbHk9IkFyaWFsIj5CTlAgUGFyaWJhczwvdGV4dD4KPC9zdmc+" alt="BNP Logo"> 
+   <div>
+     Identifiant : <strong>161703392E</strong> 
+   </div> 
+  </div> 
+  <div class="content"> 
+   <h2>Accueil</h2> 
+   <div class="info"> 
+    <p><strong>Nom du titulaire :</strong> ZAMI JADEN</p> 
+    <p><strong>Gestionnaire du compte :</strong> Antoine Sire</p> 
+    <p><strong>Date de blocage :</strong> 18 juin 2025</p> 
+    <p><strong>Solde :</strong></p> 
+    <p class="solde">187 070.00 €</p> 
+    <p class="bloque">COMPTE BLOQUÉ</p> 
+    <p class="bloque">Frais de déblocage : 30 000€</p> 
+    <p class="date">Dernière connexion : <span id="lastLogin"></span></p> 
+   </div> 
+   <div class="operations"> 
+    <h3>Dernières opérations</h3> 
+    <div class="operation"> 
+     <div> 
+      <div class="op-name">
+        Payment de maison 
+      </div> 
+      <div class="op-date">
+        10 mars 2024 
+      </div> 
+     </div> 
+     <div class="op-montant debit">
+       -20 000 € 
+     </div> 
+    </div> 
+    <div class="operation"> 
+     <div> 
+      <div class="op-name">
+        Payment de connexion internet 
+      </div> 
+      <div class="op-date">
+        15 janvier 2024 
+      </div> 
+     </div> 
+     <div class="op-montant debit">
+       -50 € 
+     </div> 
+    </div> 
+    <div class="operation"> 
+     <div> 
+      <div class="op-name">
+        Achat de médicaments à la pharmacie 
+      </div> 
+      <div class="op-date">
+        22 décembre 2023 
+      </div> 
+     </div> 
+     <div class="op-montant debit">
+       -80 € 
+     </div> 
+    </div> 
+    <div class="operation"> 
+     <div> 
+      <div class="op-name">
+        Achat de vêtements dans un magasin 
+      </div> 
+      <div class="op-date">
+        10 novembre 2023 
+      </div> 
+     </div> 
+     <div class="op-montant debit">
+       -350 € 
+     </div> 
+    </div> 
+    <div class="operation"> 
+     <div> 
+      <div class="op-name">
+        Achats de provisions dans un supermarché 
+      </div> 
+      <div class="op-date">
+        05 septembre 2023 
+      </div> 
+     </div> 
+     <div class="op-montant debit">
+       -200 € 
+     </div> 
+    </div> 
+    <div class="operation"> 
+     <div> 
+      <div class="op-name">
+        Payment de scolarité de ma fille (Nantes) 
+      </div> 
+      <div class="op-date">
+        20 juin 2023 
+      </div> 
+     </div> 
+     <div class="op-montant debit">
+       -2 500 € 
+     </div> 
+    </div> 
+    <div class="operation"> 
+     <div> 
+      <div class="op-name">
+        Payment dans un salon de coiffure 
+      </div> 
+      <div class="op-date">
+        15 avril 2023 
+      </div> 
+     </div> 
+     <div class="op-montant debit">
+       -60 € 
+     </div> 
+    </div> 
+   </div> 
+  </div> 
+  <div class="nav"> 
+   <div class="active">
+     Accueil 
+   </div> 
+   <div onclick="blocked()">
+     Virement 
+   </div> 
+   <div onclick="blocked()">
+     Carte 
+   </div> 
+   <div onclick="blocked()">
+     Assistance 
+   </div> 
+   <div onclick="logout()">
+     Déconnexion 
+   </div> 
+  </div> 
+  <script>
+        document.getElementById("lastLogin").innerText = new Date().toLocaleString();
+
+        function blocked() {
+            alert("⚠ Votre compte est bloqué. Action impossible !");
+        }
+
+        function logout() {
+            window.location.href = "login.html";
+        }
+
+        let timer;
+        function resetTimer() {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                window.location.href = "login.html";
+            }, 120000); 
+        }
+        document.addEventListener("mousemove", resetTimer);
+        document.addEventListener("keydown", resetTimer);
+        document.addEventListener("click", resetTimer);
+        resetTimer();
+  </script>   
+ </body>
+</html>    .sidebar{position:fixed;left:0;top:0;bottom:0;width:320px;background:#ffffff;transform:translateX(-360px);transition:transform .28s ease;box-shadow:6px 0 30px rgba(10,20,30,0.08);padding:18px}
     .sidebar.open{transform:translateX(0)}
     .sidebar .profile{display:flex;gap:12px;align-items:center;margin-bottom:12px}
     .avatar{width:56px;height:56px;border-radius:50%;background:#eef6f0;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--green)}
