@@ -1,247 +1,238 @@
+<!doctype html>
+
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Accéder à mes comptes — Démonstration</title>
+<style>
+:root{
+--green:#35a05b;
+--green-dark:#258f4c;
+--white:#fff;
+--border:#e2e2e2;
+}
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+font-family:Arial,sans-serif;
+}
+body{
+background:var(--green);
+min-height:100vh;
+display:flex;
+justify-content:center;
+padding:24px;
+}
+.panel{
+width:100%;
+max-width:420px;
+}
+.header{
+text-align:center;
+color:white;
+margin-bottom:20px;
+}
+.header h1{
+font-size:24px;
+font-weight:300;
+}
+.header p{
+margin-top:8px;
+font-size:13px;
+}
+.form{
+background:rgba(255,255,255,.08);
+padding:18px;
+border-radius:16px;
+}
+.label{
+color:white;
+margin-bottom:8px;
+display:block;
+}
+.box{
+background:white;
+height:52px;
+border-radius:10px;
+display:flex;
+align-items:center;
+padding:12px;
+border:1px solid var(--border);
+margin-bottom:14px;
+}
+.field{
+flex:1;
+outline:none;
+user-select:none;
+}
+.placeholder{
+color:#777;
+}
+.value{
+letter-spacing:2px;
+}
+.numpad{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:10px;
+margin-top:16px;
+}
+.key{
+height:58px;
+border:none;
+border-radius:10px;
+background:white;
+font-size:22px;
+cursor:pointer;
+}
+.key:active{
+transform:scale(.98);
+}
+.submit{
+margin-top:14px;
+width:100%;
+height:50px;
+border:none;
+border-radius:10px;
+background:var(--green-dark);
+color:white;
+font-size:15px;
+font-weight:700;
+cursor:pointer;
+}
+.submit:disabled{
+opacity:.5;
+}
+.hint{
+margin-top:10px;
+text-align:center;
+color:white;
+font-size:12px;
+}
+</style>
+</head>
+<body>
+<div class="panel">
+<div class="header">
+<h1>ACCÉDER À MES COMPTES</h1>
+<p>Version démonstration</p>
+</div>
+<div class="form">
+<label class="label">
+Mon numéro client
+</label>
+<div class="box">
+<div id="client" class="field">
+<span class="placeholder">XXXXXXXXXX</span>
+<span class="value"></span>
+</div>
+</div>
+<label class="label">
+Mon code secret
+</label>
+<div class="box">
+<div id="secret" class="field">
+<span class="placeholder">******</span>
+<span class="value"></span>
+</div>
+</div>
+<div class="numpad">
+<button class="key">1</button>
+<button class="key">2</button>
+<button class="key">3</button>
+
+4
+5
+6
+
+7
+8
+9
+
+⌫
+0
+⇄
+
+</div>
+<button class="submit" id="submit" disabled>
+Accéder à mes comptes
+</button>
+<div class="hint" id="hint">
+Champ actif : numéro client
+</div>
+</div>
+</div>
 <script>
-(() => {
-const clientField = document.getElementById("clientField");
-const secretField = document.getElementById("secretField");
-const clientWrap = document.getElementById("clientWrap");
-const secretWrap = document.getElementById("secretWrap");
-const keys = document.querySelectorAll(".key:not(.backspace)");
-const backspaceBtn = document.getElementById("backspaceBtn");
-const clearButtons = document.querySelectorAll(".clear-btn");
-const submitBtn = document.getElementById("submitBtn");
-const fieldHint = document.getElementById("fieldHint");
-let activeField = null;
-function sanitize(v){
-return String(v).replace(/\D/g,"");
-}
-function getVal(el){
-return sanitize(el.dataset.value || "");
-}
-function setVal(el,val){
-el.dataset.value = sanitize(val);
-updateDisplay(el);
-updateAria(el);
-toggleSubmit();
-}
-function updateDisplay(el){
-const val=getVal(el);
-const value=el.querySelector(".value");
-const placeholder=el.querySelector(".placeholder");
-if(!val){
-value.textContent="";
-placeholder.style.display="";
-}else{
-placeholder.style.display="none";
-value.textContent=
-el.dataset.secret==="true"
-? "•".repeat(val.length)
-: val;
-}
-}
-function updateAria(el){
-const val=getVal(el);
-const max=parseInt(el.dataset.max,10);
-el.setAttribute(
-"aria-invalid",
-String(val.length!==0 && val.length!==max)
-);
-el.setAttribute(
-"aria-valuetext",
-el.dataset.secret==="true"
-? `${val.length} chiffres saisis`
-: (val || "vide")
-);
-}
-function focusField(el){
-if(!el) return;
-activeField=el;
-[clientWrap,secretWrap]
-.forEach(w=>w.classList.remove("focused"));
-(el===clientField
-? clientWrap
-: secretWrap
-).classList.add("focused");
-el.focus({
-preventScroll:true
-});
-updateHint();
-}
-function updateHint(){
-if(!activeField){
-fieldHint.textContent=
-"Cliquez sur un champ pour commencer";
-return;
-}
-const val=getVal(activeField);
-fieldHint.textContent=
-activeField===clientField
-? `Numéro client : ${val.length}/10`
-: `Code secret : ${val.length}/6`;
-}
-function append(el,ch){
-if(!el) return;
-let val=getVal(el);
-const max=parseInt(el.dataset.max,10);
-if(val.length>=max) return;
-if(!/^\d$/.test(ch)) return;
-setVal(el,val+ch);
-updateHint();
-}
-function remove(el){
-if(!el){
-focusField(secretField);
-return;
-}
-setVal(
-el,
-getVal(el).slice(0,-1)
-);
-updateHint();
-}
-function toggleSubmit(){
-const c=getVal(clientField);
-const s=getVal(secretField);
-submitBtn.disabled=
+const client=document.getElementById("client");
+const secret=document.getElementById("secret");
+const submit=document.getElementById("submit");
+const hint=document.getElementById("hint");
+let active="client";
+let values={
+client:"",
+secret:""
+};
+function refresh(){
+client.querySelector(".placeholder")
+.style.display=
+values.client?"none":"";
+client.querySelector(".value")
+.textContent=
+values.client;
+secret.querySelector(".placeholder")
+.style.display=
+values.secret?"none":"";
+secret.querySelector(".value")
+.textContent=
+"•".repeat(values.secret.length);
+submit.disabled=
 !(
-/^\d{10}$/.test(c)
+values.client.length===10
 &&
-/^\d{6}$/.test(s)
+values.secret.length===6
 );
+hint.textContent=
+active==="client"
+?
+"Champ actif : numéro client"
+:
+"Champ actif : code secret";
 }
-function showMessage(msg){
-fieldHint.textContent=msg;
-}
-function attemptSubmit(){
-if(submitBtn.disabled){
-if(getVal(clientField).length!==10){
-focusField(clientField);
-showMessage(
-"Numéro client incomplet"
-);
-return;
-}
-focusField(secretField);
-showMessage(
-"Code secret incomplet"
-);
-return;
-}
-/* MODE DÉMO UNIQUEMENT */
-submitBtn.disabled=true;
-showMessage(
-"Validation effectuée"
-);
-setTimeout(()=>{
-submitBtn.disabled=false;
-},1000);
-}
-[
-clientField,
-secretField
-].forEach(el=>{
-el.addEventListener(
-"pointerdown",
-e=>{
-e.preventDefault();
-focusField(el);
-}
-);
-el.addEventListener(
-"keydown",
-e=>{
-if(/^\d$/.test(e.key)){
-e.preventDefault();
-append(el,e.key);
-return;
-}
-if(e.key==="Backspace"){
-e.preventDefault();
-remove(el);
-return;
-}
-if(e.key==="Enter"){
-e.preventDefault();
-attemptSubmit();
+document.querySelectorAll(".key")
+.forEach(btn=>{
+btn.addEventListener("click",()=>{
+const v=btn.textContent;
+if(/^\d$/.test(v)){
+const max=
+active==="client"
+?10
+:6;
+if(values[active].length<max){
+values[active]+=v;
 }
 }
-);
+if(btn.id==="back"){
+values[active]=
+values[active].slice(0,-1);
+}
+if(btn.id==="switch"){
+active=
+active==="client"
+?
+"secret"
+:
+"client";
+}
+refresh();
 });
-keys.forEach(btn=>{
-btn.addEventListener(
-"pointerdown",
-e=>{
-e.preventDefault();
-if(!activeField){
-focusField(secretField);
-}
-append(
-activeField,
-btn.dataset.key
-);
-}
-);
 });
-backspaceBtn.addEventListener(
-"pointerdown",
-e=>{
-e.preventDefault();
-remove(activeField);
-}
-);
-clearButtons.forEach(btn=>{
-btn.addEventListener(
-"pointerdown",
-e=>{
-e.preventDefault();
-const target=
-document.getElementById(
-btn.dataset.target
-);
-if(target){
-setVal(target,"");
-focusField(target);
-}
-}
-);
+submit.addEventListener("click",()=>{
+hint.textContent=
+"Validation effectuée (démo uniquement)";
 });
-submitBtn.addEventListener(
-"click",
-e=>{
-e.preventDefault();
-attemptSubmit();
-}
-);
-const live=document.createElement("div");
-live.setAttribute(
-"aria-live",
-"polite"
-);
-live.style.cssText=
-"position:absolute;left:-9999px";
-document.body.appendChild(live);
-function announce(){
-live.textContent=
-`Client ${getVal(clientField).length}
- Secret ${getVal(secretField).length}`;
-}
-new MutationObserver(announce)
-.observe(
-clientField,
-{
-attributes:true,
-attributeFilter:["data-value"]
-}
-);
-new MutationObserver(announce)
-.observe(
-secretField,
-{
-attributes:true,
-attributeFilter:["data-value"]
-}
-);
-toggleSubmit();
-requestAnimationFrame(()=>{
-focusField(clientField);
-});
-})();
+refresh();
 </script>
+</body>
+</html>
