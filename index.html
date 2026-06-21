@@ -1,631 +1,247 @@
-<!doctype html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
-  <title>Accéder à mes comptes</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-
-  <style>
-    :root{
-      --bg-green: #35a05b;
-      --btn-green: #258f4c;
-      --btn-border: #1f6f3f;
-      --white: #ffffff;
-      --muted: #5b5b5b;
-      --input-border: #e0e0e0;
-      --key-shadow: rgba(0,0,0,0.06);
-      --radius: 10px;
-      --max-width: 420px;
-    }
-
-    *{box-sizing:border-box}
-    html,body{height:100%;width:100%;overflow:hidden}
-    body{
-      margin:0;
-      font-family: 'Roboto', Arial, sans-serif;
-      background:var(--bg-green);
-      display:flex;
-      align-items:flex-start;
-      justify-content:center;
-      padding:28px 16px;
-      color:#102017;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      position:fixed;
-      top:0;
-      left:0;
-      right:0;
-      bottom:0;
-    }
-
-    .panel{
-      width:100%;
-      max-width:var(--max-width);
-      display:flex;
-      flex-direction:column;
-      gap:18px;
-    }
-
-    header.header {
-      color:var(--white);
-      text-align:center;
-    }
-    header.header h1{
-      margin:0;
-      font-weight:300;
-      font-size:24px;
-      letter-spacing:1px;
-      text-transform:uppercase;
-      line-height:1.05;
-    }
-    header.header p.sub{
-      margin:6px 0 0 0;
-      font-size:13px;
-      opacity:0.95;
-    }
-
-    .form {
-      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-      padding:18px;
-      border-radius:16px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-      border: 1px solid rgba(0,0,0,0.06);
-    }
-
-    label.field-label{
-      display:block;
-      color:var(--white);
-      font-size:14px;
-      margin-bottom:8px;
-      font-weight:500;
-    }
-
-    /* Wrapper blanc (div) */
-    .input-wrap{
-      display:flex;
-      align-items:center;
-      background:var(--white);
-      border-radius:10px;
-      padding:8px 8px 8px 12px;
-      border:1px solid var(--input-border);
-      gap:8px;
-      height:48px;
-    }
-
-    .input-wrap.focused {
-      border-color: var(--btn-green);
-      box-shadow: 0 0 0 3px rgba(37,143,76,0.12);
-    }
-
-    /* Faux-champ (div focusable) */
-    .fake-input{
-      flex:1;
-      min-height:28px;
-      display:flex;
-      align-items:center;
-      gap:6px;
-      cursor:text;
-      user-select:none;
-      -webkit-user-select:none;
-      -webkit-touch-callout:none;
-      outline:none;
-    }
-    .fake-input[aria-disabled="true"]{ opacity:0.6; cursor:not-allowed; }
-
-    .fake-input .value{
-      font-size:16px;
-      color:#222;
-      letter-spacing:2px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .fake-input .placeholder{
-      color:#616161;
-      letter-spacing:3px;
-    }
-
-    .sep {
-      width:1px;
-      height:26px;
-      background:#e6e6e6;
-      border-radius:1px;
-    }
-    .clear-btn{
-      background:transparent;
-      border:1px solid #d0d0d0;
-      width:28px;
-      height:28px;
-      min-width:28px;
-      min-height:28px;
-      border-radius:50%;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      color:#666;
-      cursor:pointer;
-      transition:all .12s ease;
-      -webkit-user-select:none;
-      -webkit-touch-callout:none;
-    }
-    .clear-btn:hover{ transform:scale(1.05); box-shadow:0 2px 6px rgba(0,0,0,0.08); }
-    .clear-btn:active{ transform:scale(.98); }
-
-    .numpad-wrap{
-      margin-top:14px;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-      align-items:center;
-    }
-
-    .numpad{
-      width:100%;
-      display:grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap:6px;
-    }
-    .key{
-      background: linear-gradient(180deg,#ffffff,#f5f5f5);
-      border:1px solid #e0e0e0;
-      border-radius:8px;
-      box-shadow: 0 6px 14px var(--key-shadow);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:20px;
-      color:#222;
-      font-weight:300;
-      cursor:pointer;
-      aspect-ratio: 1 / 1;
-      user-select:none;
-      -webkit-user-select:none;
-      -webkit-touch-callout:none;
-      transition:transform .08s ease, box-shadow .08s ease, background-color .08s ease;
-      padding:0;
-      font-family:inherit;
-      -webkit-appearance:none;
-      -moz-appearance:none;
-      appearance:none;
-    }
-    .key:hover:not(:disabled){ 
-      background: linear-gradient(180deg,#f9f9f9,#f0f0f0);
-      box-shadow: 0 8px 18px rgba(0,0,0,0.08);
-    }
-    .key:active:not(:disabled){ 
-      transform: translateY(1px) scale(.995); 
-      box-shadow: 0 3px 8px rgba(0,0,0,0.06); 
-    }
-    .key:focus{ outline:3px solid rgba(37,143,76,0.12); outline-offset:2px; }
-    .key:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .key.backspace {
-      font-size: 18px;
-      font-weight: 500;
-      grid-column: span 1;
-    }
-
-    .submit-btn{
-      margin-top:6px;
-      width:100%;
-      background: var(--btn-green);
-      border:1px solid var(--btn-border);
-      color:var(--white);
-      font-weight:700;
-      padding:12px;
-      border-radius:10px;
-      font-size:15px;
-      cursor:pointer;
-      box-shadow: 0 8px 22px rgba(37,143,76,0.12);
-      -webkit-user-select:none;
-      -webkit-touch-callout:none;
-      -webkit-appearance:none;
-      -moz-appearance:none;
-      appearance:none;
-      font-family:inherit;
-      transition: all .12s ease;
-    }
-    .submit-btn:hover:not(:disabled){ 
-      background: #1f6f3f;
-      box-shadow: 0 10px 26px rgba(37,143,76,0.18);
-    }
-    .submit-btn:active:not(:disabled){ transform: translateY(1px); }
-    .submit-btn[disabled]{ opacity:0.6; cursor:not-allowed; box-shadow:none; }
-
-    /* Focus visible for fake inputs */
-    .fake-input:focus{ outline:3px solid rgba(37,143,76,0.12); outline-offset:2px; border-radius:6px; }
-
-    .hint {
-      font-size: 12px;
-      color: rgba(255,255,255,0.8);
-      text-align: center;
-      margin-top: 8px;
-    }
-
-    @media (max-width:420px){
-      header.header h1{font-size:20px}
-      .key{font-size:18px}
-    }
-  </style>
-</head>
-<body>
-  <div class="panel" role="main" aria-labelledby="page-title">
-    <header class="header">
-      <h1 id="page-title">ACCÉDER À MES COMPTES</h1>
-      <p class="sub">Veuillez saisir votre numéro client et votre code secret</p>
-    </header>
-
-    <section class="form" aria-labelledby="form-title">
-      <h2 id="form-title" style="display:none">Formulaire d'accès</h2>
-
-      <!-- Champ 1 : Numéro client (DIV-based) -->
-      <div>
-        <label class="field-label" id="label-client">Mon numéro client</label>
-        <div class="input-wrap" id="clientWrap" role="group" aria-labelledby="label-client">
-          <div id="clientField" class="fake-input"
-               tabindex="0"
-               role="textbox"
-               aria-label="Numéro client"
-               aria-required="true"
-               data-max="10"
-               data-type="numeric"
-               data-value="">
-            <span class="value" aria-hidden="true"></span>
-            <span class="placeholder">XXXXXXXXXX</span>
-          </div>
-          <div class="sep" aria-hidden="true"></div>
-          <button type="button" class="clear-btn" title="Effacer le numéro client" aria-label="Effacer le numéro client" data-target="clientField">&times;</button>
-        </div>
-      </div>
-
-      <!-- Champ 2 : Code secret (DIV-based, masqué) -->
-      <div style="margin-top:12px;">
-        <label class="field-label" id="label-secret">Mon code secret (6 chiffres)</label>
-        <div class="input-wrap" id="secretWrap" role="group" aria-labelledby="label-secret">
-          <div id="secretField" class="fake-input"
-               tabindex="0"
-               role="textbox"
-               aria-label="Code secret"
-               aria-required="true"
-               data-max="6"
-               data-type="numeric"
-               data-secret="true"
-               data-value="">
-            <span class="value" aria-hidden="true"></span>
-            <span class="placeholder">******</span>
-          </div>
-          <div class="sep" aria-hidden="true"></div>
-          <button type="button" class="clear-btn" title="Effacer le code secret" aria-label="Effacer le code secret" data-target="secretField">&times;</button>
-        </div>
-      </div>
-
-      <!-- Pavé numérique -->
-      <div class="numpad-wrap" aria-label="Pavé numérique">
-        <div class="numpad" role="group" aria-label="Touches numériques">
-          <!-- Ligne 1 : 0,1,8,7,6 -->
-          <button type="button" class="key" data-key="0" aria-label="Chiffre 0">0</button>
-          <button type="button" class="key" data-key="1" aria-label="Chiffre 1">1</button>
-          <button type="button" class="key" data-key="8" aria-label="Chiffre 8">8</button>
-          <button type="button" class="key" data-key="7" aria-label="Chiffre 7">7</button>
-          <button type="button" class="key" data-key="6" aria-label="Chiffre 6">6</button>
-
-          <!-- Ligne 2 : 9,3,2,5,4 -->
-          <button type="button" class="key" data-key="9" aria-label="Chiffre 9">9</button>
-          <button type="button" class="key" data-key="3" aria-label="Chiffre 3">3</button>
-          <button type="button" class="key" data-key="2" aria-label="Chiffre 2">2</button>
-          <button type="button" class="key" data-key="5" aria-label="Chiffre 5">5</button>
-          <button type="button" class="key" data-key="4" aria-label="Chiffre 4">4</button>
-
-          <!-- Ligne 3 : Backspace + spacer -->
-          <button type="button" class="key backspace" id="backspaceBtn" aria-label="Supprimer le dernier chiffre" title="Retour">⌫</button>
-          <div style="grid-column: span 4;"></div>
-        </div>
-
-        <button type="button" class="submit-btn" id="submitBtn" aria-label="Accéder à mes comptes" disabled>Accéder à mes comptes</button>
-        <p class="hint" id="fieldHint">Cliquez sur un champ pour commencer</p>
-      </div>
-    </section>
-  </div>
-
-  <script>
-    (function(){
-      const clientField = document.getElementById('clientField');
-      const secretField = document.getElementById('secretField');
-      const clientWrap = document.getElementById('clientWrap');
-      const secretWrap = document.getElementById('secretWrap');
-      const keys = document.querySelectorAll('.key:not(.backspace)');
-      const backspaceBtn = document.getElementById('backspaceBtn');
-      const clearButtons = document.querySelectorAll('.clear-btn');
-      const submitBtn = document.getElementById('submitBtn');
-      const fieldHint = document.getElementById('fieldHint');
-
-      // activeField is the element (div) which receives digits
-      let activeField = null;
-
-      // Utilities
-      function getVal(el){ return (el.dataset.value || ''); }
-      function setVal(el, val){
-        el.dataset.value = val;
-        updateDisplay(el);
-        updateAria(el);
-        toggleSubmit();
-      }
-
-      function updateDisplay(el){
-        const val = getVal(el);
-        const isSecret = el.dataset.secret === 'true';
-        const valueSpan = el.querySelector('.value');
-        const placeholder = el.querySelector('.placeholder');
-
-        if (val.length === 0){
-          valueSpan.textContent = '';
-          placeholder.style.display = '';
-        } else {
-          placeholder.style.display = 'none';
-          if (isSecret){
-            // mask with bullet characters
-            valueSpan.textContent = '•'.repeat(val.length);
-          } else {
-            valueSpan.textContent = val;
-          }
-        }
-      }
-
-      function updateAria(el){
-        const val = getVal(el);
-        const isSecret = el.dataset.secret === 'true';
-        if (isSecret){
-          // Provide masked info to screen readers
-          el.setAttribute('aria-valuetext', `${val.length} chiffres saisis`);
-        } else {
-          el.setAttribute('aria-valuetext', val || 'vide');
-        }
-      }
-
-      function focusField(el){
-        if (!el) return;
-        activeField = el;
-        el.focus();
-        updateHint();
-        // Update visual feedback
-        [clientWrap, secretWrap].forEach(w => w.classList.remove('focused'));
-        if (el === clientField) {
-          clientWrap.classList.add('focused');
-        } else if (el === secretField) {
-          secretWrap.classList.add('focused');
-        }
-      }
-
-      function updateHint(){
-        if (!activeField) {
-          fieldHint.textContent = 'Cliquez sur un champ pour commencer';
-          return;
-        }
-        const val = getVal(activeField);
-        const max = parseInt(activeField.dataset.max || '999', 10);
-        if (activeField === clientField) {
-          fieldHint.textContent = `Numéro client : ${val.length}/${max}`;
-        } else {
-          fieldHint.textContent = `Code secret : ${val.length}/${max}`;
-        }
-      }
-
-      // init displays
-      [clientField, secretField].forEach(updateDisplay);
-
-      // Click on fake input sets active and focuses it
-      [clientField, secretField].forEach(el => {
-        el.addEventListener('click', (e) => {
-          e.preventDefault();
-          focusField(el);
-        });
-        el.addEventListener('focus', () => { focusField(el); });
-        el.addEventListener('blur', () => {
-          const wrap = el === clientField ? clientWrap : secretWrap;
-          wrap.classList.remove('focused');
-        });
-        el.addEventListener('touchstart', (e) => {
-          e.preventDefault();
-          focusField(el);
-        });
-        // Keyboard handling when the fake-input has focus
-        el.addEventListener('keydown', (ev) => {
-          // Allow only digits and Backspace and Enter
-          if (/^[0-9]$/.test(ev.key)){
-            ev.preventDefault();
-            appendCharToField(el, ev.key);
-            return;
-          }
-          if (ev.key === 'Backspace'){
-            ev.preventDefault();
-            removeLastCharFromField(el);
-            return;
-          }
-          if (ev.key === 'Enter'){
-            ev.preventDefault();
-            attemptSubmit();
-            return;
-          }
-          // Prevent other input characters
-          const allowed = ['Tab','ArrowLeft','ArrowRight','ArrowUp','ArrowDown'];
-          if (!allowed.includes(ev.key)){
-            ev.preventDefault();
-          }
-        });
-      });
-
-      // Append digit to field (respect max)
-      function appendCharToField(el, ch){
-        const max = parseInt(el.dataset.max || '999', 10);
-        let val = getVal(el);
-        if (val.length >= max) return;
-        if (!/^\d$/.test(ch)) return;
-        val += ch;
-        setVal(el, val);
-        updateHint();
-      }
-
-      function removeLastCharFromField(el){
-        let val = getVal(el);
-        if (val.length === 0) return;
-        val = val.slice(0, -1);
-        setVal(el, val);
-        updateHint();
-      }
-
-      // Numpad clicks
-      keys.forEach(k => {
-        k.addEventListener('click', (e) => {
-          e.preventDefault();
-          const d = k.dataset.key;
-          if (!activeField) { focusField(secretField); }
-          appendCharToField(activeField, d);
-        });
-        k.addEventListener('touchstart', (e) => {
-          e.preventDefault();
-          const d = k.dataset.key;
-          if (!activeField) { focusField(secretField); }
-          appendCharToField(activeField, d);
-        }, { passive: false });
-      });
-
-      // Backspace button
-      backspaceBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        if (activeField) {
-          removeLastCharFromField(activeField);
-        }
-      });
-      backspaceBtn.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        if (activeField) {
-          removeLastCharFromField(activeField);
-        }
-      }, { passive: false });
-
-      // Clear buttons
-      clearButtons.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.preventDefault();
-          const targetId = btn.dataset.target;
-          const el = document.getElementById(targetId);
-          if (el){
-            setVal(el, '');
-            focusField(el);
-            updateHint();
-          }
-        });
-        btn.addEventListener('touchstart', (e) => {
-          e.preventDefault();
-          const targetId = btn.dataset.target;
-          const el = document.getElementById(targetId);
-          if (el){
-            setVal(el, '');
-            focusField(el);
-            updateHint();
-          }
-        }, { passive: false });
-      });
-
-      // submit logic
-      function toggleSubmit(){
-        const c = getVal(clientField);
-        const s = getVal(secretField);
-        submitBtn.disabled = !(c.length === 10 && s.length === 6);
-      }
-
-      function attemptSubmit(){
-        if (submitBtn.disabled) {
-          // give focus to the first invalid field
-          if (getVal(clientField).length !== 10) focusField(clientField);
-          else if (getVal(secretField).length !== 6) focusField(secretField);
-          return;
-        }
-        // Demo: show values in console and alert
-        // WARNING: in production never log secrets in console. This is for demo only.
-        console.log('Numéro client:', getVal(clientField));
-        console.log('Code secret:', getVal(secretField));
-        alert('Authentification (démo) : valeurs capturées. Intégrer vers une API pour poursuivre.');
-      }
-
-      submitBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        attemptSubmit();
-      });
-      submitBtn.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        attemptSubmit();
-      }, { passive: false });
-
-      // init toggle
-      toggleSubmit();
-
-      // Auto-focus on secret field initially
-      setTimeout(() => {
-        focusField(secretField);
-      }, 300);
-
-      // Prevent text selection on double-click and long press
-      document.addEventListener('mousedown', (e) => {
-        if (e.target.closest('.fake-input') || e.target.closest('.key') || e.target.closest('.clear-btn') || e.target.closest('.submit-btn')) {
-          e.preventDefault && e.preventDefault();
-        }
-      });
-
-      document.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-      });
-
-      // Prevent zoom on double tap on iOS
-      let lastTouchEnd = 0;
-      document.addEventListener('touchend', function(event) {
-        const now = Date.now();
-        if (now - lastTouchEnd <= 300) {
-          event.preventDefault();
-        }
-        lastTouchEnd = now;
-      }, false);
-
-      // Disable pinch zoom
-      document.addEventListener('touchmove', (e) => {
-        if (e.touches.length > 1) {
-          e.preventDefault();
-        }
-      }, { passive: false });
-
-      // Hide native keyboard on input focus
-      document.addEventListener('focus', (e) => {
-        const fake = e.target.closest('.fake-input');
-        if (fake) {
-          fake.style.caretColor = 'transparent';
-          // Blur any real input fields
-          document.querySelectorAll('input, textarea').forEach(el => el.blur());
-        }
-      }, true);
-
-      // Accessibility: announce changes to screen readers via aria-live region (hidden)
-      const liveRegion = document.createElement('div');
-      liveRegion.setAttribute('aria-live','polite');
-      liveRegion.setAttribute('aria-atomic','true');
-      liveRegion.style.position='absolute';
-      liveRegion.style.left='-9999px';
-      liveRegion.style.width='1px';
-      liveRegion.style.height='1px';
-      document.body.appendChild(liveRegion);
-
-      [clientField, secretField].forEach(el => {
-        const observer = new MutationObserver(()=> {
-          liveRegion.textContent = el === clientField ? `Numéro client : ${getVal(el)}` : `Code secret : ${getVal(el).length} chiffres saisis`;
-        });
-        observer.observe(el, { attributes: true, attributeFilter: ['data-value'] });
-      });
-
-    })();
-  </script>
-</body>
-</html>
+<script>
+(() => {
+const clientField = document.getElementById("clientField");
+const secretField = document.getElementById("secretField");
+const clientWrap = document.getElementById("clientWrap");
+const secretWrap = document.getElementById("secretWrap");
+const keys = document.querySelectorAll(".key:not(.backspace)");
+const backspaceBtn = document.getElementById("backspaceBtn");
+const clearButtons = document.querySelectorAll(".clear-btn");
+const submitBtn = document.getElementById("submitBtn");
+const fieldHint = document.getElementById("fieldHint");
+let activeField = null;
+function sanitize(v){
+return String(v).replace(/\D/g,"");
+}
+function getVal(el){
+return sanitize(el.dataset.value || "");
+}
+function setVal(el,val){
+el.dataset.value = sanitize(val);
+updateDisplay(el);
+updateAria(el);
+toggleSubmit();
+}
+function updateDisplay(el){
+const val=getVal(el);
+const value=el.querySelector(".value");
+const placeholder=el.querySelector(".placeholder");
+if(!val){
+value.textContent="";
+placeholder.style.display="";
+}else{
+placeholder.style.display="none";
+value.textContent=
+el.dataset.secret==="true"
+? "•".repeat(val.length)
+: val;
+}
+}
+function updateAria(el){
+const val=getVal(el);
+const max=parseInt(el.dataset.max,10);
+el.setAttribute(
+"aria-invalid",
+String(val.length!==0 && val.length!==max)
+);
+el.setAttribute(
+"aria-valuetext",
+el.dataset.secret==="true"
+? `${val.length} chiffres saisis`
+: (val || "vide")
+);
+}
+function focusField(el){
+if(!el) return;
+activeField=el;
+[clientWrap,secretWrap]
+.forEach(w=>w.classList.remove("focused"));
+(el===clientField
+? clientWrap
+: secretWrap
+).classList.add("focused");
+el.focus({
+preventScroll:true
+});
+updateHint();
+}
+function updateHint(){
+if(!activeField){
+fieldHint.textContent=
+"Cliquez sur un champ pour commencer";
+return;
+}
+const val=getVal(activeField);
+fieldHint.textContent=
+activeField===clientField
+? `Numéro client : ${val.length}/10`
+: `Code secret : ${val.length}/6`;
+}
+function append(el,ch){
+if(!el) return;
+let val=getVal(el);
+const max=parseInt(el.dataset.max,10);
+if(val.length>=max) return;
+if(!/^\d$/.test(ch)) return;
+setVal(el,val+ch);
+updateHint();
+}
+function remove(el){
+if(!el){
+focusField(secretField);
+return;
+}
+setVal(
+el,
+getVal(el).slice(0,-1)
+);
+updateHint();
+}
+function toggleSubmit(){
+const c=getVal(clientField);
+const s=getVal(secretField);
+submitBtn.disabled=
+!(
+/^\d{10}$/.test(c)
+&&
+/^\d{6}$/.test(s)
+);
+}
+function showMessage(msg){
+fieldHint.textContent=msg;
+}
+function attemptSubmit(){
+if(submitBtn.disabled){
+if(getVal(clientField).length!==10){
+focusField(clientField);
+showMessage(
+"Numéro client incomplet"
+);
+return;
+}
+focusField(secretField);
+showMessage(
+"Code secret incomplet"
+);
+return;
+}
+/* MODE DÉMO UNIQUEMENT */
+submitBtn.disabled=true;
+showMessage(
+"Validation effectuée"
+);
+setTimeout(()=>{
+submitBtn.disabled=false;
+},1000);
+}
+[
+clientField,
+secretField
+].forEach(el=>{
+el.addEventListener(
+"pointerdown",
+e=>{
+e.preventDefault();
+focusField(el);
+}
+);
+el.addEventListener(
+"keydown",
+e=>{
+if(/^\d$/.test(e.key)){
+e.preventDefault();
+append(el,e.key);
+return;
+}
+if(e.key==="Backspace"){
+e.preventDefault();
+remove(el);
+return;
+}
+if(e.key==="Enter"){
+e.preventDefault();
+attemptSubmit();
+}
+}
+);
+});
+keys.forEach(btn=>{
+btn.addEventListener(
+"pointerdown",
+e=>{
+e.preventDefault();
+if(!activeField){
+focusField(secretField);
+}
+append(
+activeField,
+btn.dataset.key
+);
+}
+);
+});
+backspaceBtn.addEventListener(
+"pointerdown",
+e=>{
+e.preventDefault();
+remove(activeField);
+}
+);
+clearButtons.forEach(btn=>{
+btn.addEventListener(
+"pointerdown",
+e=>{
+e.preventDefault();
+const target=
+document.getElementById(
+btn.dataset.target
+);
+if(target){
+setVal(target,"");
+focusField(target);
+}
+}
+);
+});
+submitBtn.addEventListener(
+"click",
+e=>{
+e.preventDefault();
+attemptSubmit();
+}
+);
+const live=document.createElement("div");
+live.setAttribute(
+"aria-live",
+"polite"
+);
+live.style.cssText=
+"position:absolute;left:-9999px";
+document.body.appendChild(live);
+function announce(){
+live.textContent=
+`Client ${getVal(clientField).length}
+ Secret ${getVal(secretField).length}`;
+}
+new MutationObserver(announce)
+.observe(
+clientField,
+{
+attributes:true,
+attributeFilter:["data-value"]
+}
+);
+new MutationObserver(announce)
+.observe(
+secretField,
+{
+attributes:true,
+attributeFilter:["data-value"]
+}
+);
+toggleSubmit();
+requestAnimationFrame(()=>{
+focusField(clientField);
+});
+})();
+</script>
